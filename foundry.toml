@@ -1,0 +1,19 @@
+[profile.default]
+src = "src"
+test = "test"
+out = "out"
+libs = ["lib"]
+auto_detect_remappings = false
+remappings = [
+    "base-std/=lib/base-std/src/",
+    "base-std-test/=lib/base-std/test/",
+    "forge-std/=lib/forge-std/src/"
+]
+solc = "0.8.30"
+optimizer = true
+optimizer_runs = 200
+evm_version = "cancun"
+
+[fmt]
+line_length = 120
+

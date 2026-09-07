@@ -1,0 +1,136 @@
+No files changed, compilation skipped
+
+Ran 1 test for test/CobaltMultiplier.t.sol:CobaltMultiplierTest
+[PASS] test_cobaltActivationHasNoEvent() (gas: 73034)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  COBALT REFERENCE/FUTURE ONLY; no deployed Coinbase-stock claim.
+  scheduling logs (actual captured): 1
+  scheduled old multiplier: 1000000000000000000
+  scheduled new multiplier: 4000000000000000000
+  scheduled effectiveAt: 3601
+  activation-boundary logs (actual captured): 0
+  event-only current-value cache: 1000000000000000000
+  effective onchain-reference multiplier: 4000000000000000000
+  schedule-aware cache: 4000000000000000000
+  raw transfer (none authorized): 0
+  UI delivery (none authorized): 0
+  PASS: lazy activation emitted zero logs; schedule-aware consumer remains correct.
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 6.08ms (840.80µs CPU time)
+
+Ran 7 tests for test/ShareIntent.t.sol:ShareIntentTest
+[PASS] test_exactIntentRejectsUnrepresentableRounding() (gas: 218153)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: execution-time shares / exactness guard
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 3000000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 0
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 3000000000000000000
+  actual raw transfer: 0
+  actual UI delivery: 0
+  official helper rounded raw amount: 666666666666666666
+  official helper deliverable UI (rejected): 1999999999999999998
+  PASS: floors lose 2 UI base units; EXACT instruction reverts instead of silently underdelivering.
+
+[PASS] test_executionTimeIntentStaleQuote() (gas: 341432)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: execution-time shares / cached baseline
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 4000000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 0
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 0
+  actual raw transfer: 2000000000000000000
+  actual UI delivery: 8000000000000000000
+  PASS: baseline delivers 8 UI instead of requested 2; mismatch reproduced.
+  authorized unit: execution-time shares / atomic conversion
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 4000000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 0
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 3000000000000000000
+  actual raw transfer: 500000000000000000
+  actual UI delivery: 2000000000000000000
+  PASS: execution-time official helper + transfer delivers exactly 2 UI.
+
+[PASS] test_noMultiplierChangeBothPathsAgree() (gas: 305274)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: execution-time shares / unchanged multiplier control
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 1000000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 0
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 3000000000000000000
+  actual raw transfer: 2000000000000000000
+  actual UI delivery: 2000000000000000000
+  PASS: both paths deliver 2 raw / 2 UI when multiplier stays unchanged.
+
+[PASS] test_rawTokenInstructionUnaffected() (gas: 217528)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: raw tokens / no UI promise
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 4000000000000000000
+  authorized UI amount (0 if N/A): 0
+  authorized raw amount (0 if N/A): 2000000000000000000
+  cached raw quote (0 if N/A): 0
+  maxRawSpend (0 if N/A): 2000000000000000000
+  actual raw transfer: 2000000000000000000
+  actual UI delivery: 8000000000000000000
+  PASS: exactly 2 raw delivered; changed UI representation does not violate raw intent.
+
+[PASS] test_reverseSplitRespectsMaxSpend() (gas: 221033)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: execution-time shares / capped reverse split
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 250000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 0
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 3000000000000000000
+  actual raw transfer: 0
+  actual UI delivery: 0
+  required raw transfer (rejected): 8000000000000000000
+  PASS: exact MaxRawSpendExceeded(8e18, 3e18) revert; balances and allowance unchanged.
+
+[PASS] test_reverseSplitSufficientCapSucceeds() (gas: 205014)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: execution-time shares / sufficient reverse-split cap
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 250000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 0
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 8000000000000000000
+  actual raw transfer: 8000000000000000000
+  actual UI delivery: 2000000000000000000
+  PASS: authorized 8 raw cap permits delivery of 2 UI.
+
+[PASS] test_signingTimeIntent() (gas: 221046)
+Logs:
+  [base-std] REFERENCE mode: exercising the Solidity mocks; base/base is NOT under test
+  authorized unit: signing-time position / fixed raw entitlement
+  multiplier at authorization: 1000000000000000000
+  multiplier at execution: 4000000000000000000
+  authorized UI amount (0 if N/A): 2000000000000000000
+  authorized raw amount (0 if N/A): 2000000000000000000
+  cached raw quote (0 if N/A): 2000000000000000000
+  maxRawSpend (0 if N/A): 3000000000000000000
+  actual raw transfer: 2000000000000000000
+  actual UI delivery: 8000000000000000000
+  PASS: 2 raw / 8 UI preserves the original raw entitlement, not a guaranteed dollar value.
+
+Suite result: ok. 7 passed; 0 failed; 0 skipped; finished in 8.59ms (5.52ms CPU time)
+
+Ran 2 test suites in 29.03ms (14.66ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)

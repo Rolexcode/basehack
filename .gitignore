@@ -1,0 +1,20 @@
+# Foundry outputs
+out/
+cache/
+broadcast/
+
+# Local environment and editor state
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+
+# Video working files and dependencies
+demo-video/node_modules/
+demo-video/out/
+demo-video/.cache/
+
+# OS files
+.DS_Store
+Thumbs.db

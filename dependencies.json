@@ -1,0 +1,14 @@
+{
+  "base-std": {
+    "repository": "https://github.com/base/base-std",
+    "commit": "be6d0450890e20fc4a739aeaff5e839f234d12a6",
+    "vendored": "src, test/lib, docs, changelog; unmodified"
+  },
+  "forge-std": {
+    "repository": "https://github.com/foundry-rs/forge-std",
+    "commit": "620536fa5277db4e3fd46772d5cbc1ea0696fb43",
+    "vendored": "src; unmodified"
+  },
+  "forge": "1.7.1",
+  "solc": "0.8.30"
+}

@@ -1,0 +1,11 @@
+Compiling 49 files with Solc 0.8.30
+Solc 0.8.30 finished in 12.04s
+Compiler run successful!
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ test\CobaltMultiplier.t.sol:43:38
+   │
+43 │         uint256 scheduleAwareCache = block.timestamp >= effective ? newM : oldM;
+   │                                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: https://book.getfoundry.sh/reference/forge/forge-lint#block-timestamp
+
