@@ -1,7 +1,13 @@
-/** Integer model of the pinned Foundry fixtures. This module never submits transactions. */
-export const WAD = 10n ** 18n;
-export const MAX_UINT256 = (1n << 256n) - 1n;
-export type IntentUnit = "execution" | "position" | "raw";
+import {
+  guardIntent,
+  MAX_B20_MULTIPLIER,
+  MAX_UINT256,
+  WAD,
+  type IntentUnit,
+} from "./invariant";
+
+export { WAD, MAX_UINT256, type IntentUnit } from "./invariant";
+
 export type Experiment = {
   amount: string;
   before: string;
@@ -64,6 +70,7 @@ export function parseDecimal(input: string, decimals = 18): bigint {
     throw new Error("Amount exceeds the contract integer limit.");
   return result;
 }
+
 export function formatDecimal(value: bigint, decimals = 18): string {
   const sign = value < 0n ? "-" : "";
   const v = value < 0n ? -value : value;
@@ -74,54 +81,37 @@ export function formatDecimal(value: bigint, decimals = 18): string {
     .replace(/0+$/, "");
   return sign + (v / scale).toString() + (fraction ? "." + fraction : "");
 }
-function multiplyDivide(a: bigint, b: bigint, divisor: bigint): bigint {
-  if (a * b > MAX_UINT256)
-    throw new Error("Conversion would overflow the contract integer limit.");
-  return (a * b) / divisor;
-}
+
 export function simulate(input: Experiment) {
   const amount = parseDecimal(input.amount);
   const before = parseDecimal(input.before);
   const after = parseDecimal(input.after);
   const cap = parseDecimal(input.cap);
-  if (amount === 0n)
-    throw new Error("Requested amount must be greater than zero.");
-  if (
-    before === 0n ||
-    after === 0n ||
-    before > (1n << 128n) - 1n ||
-    after > (1n << 128n) - 1n
-  )
-    throw new Error(
-      "Multiplier must be positive and within the B20 uint128 bound.",
-    );
-  if (!["execution", "position", "raw"].includes(input.unit))
-    throw new Error("Choose a supported intent.");
-  const quotedRaw =
-    input.unit === "raw" ? amount : multiplyDivide(amount, WAD, before);
-  const requiredRaw =
-    input.unit === "execution" ? multiplyDivide(amount, WAD, after) : quotedRaw;
-  const naiveUI = multiplyDivide(quotedRaw, after, WAD);
-  const deliverableUI = multiplyDivide(requiredRaw, after, WAD);
-  const rejection =
-    requiredRaw > cap
-      ? "cap"
-      : input.unit === "execution" && deliverableUI !== amount
-        ? "rounding"
-        : null;
+  if (before > MAX_B20_MULTIPLIER || after > MAX_B20_MULTIPLIER)
+    throw new Error("Multiplier must be positive and within the B20 uint128 bound.");
+
+  const decision = guardIntent({
+    unit: input.unit,
+    amount,
+    quoteMultiplier: before,
+    executionMultiplier: after,
+    maxRawSpend: cap,
+  });
+
   return {
     amount,
     before,
     after,
     cap,
-    quotedRaw,
-    requiredRaw,
-    naiveUI,
-    deliverableUI,
-    rejection,
-    rawSpent: rejection ? 0n : requiredRaw,
-    deliveredUI: rejection ? 0n : deliverableUI,
-    naiveMatches: input.unit !== "execution" || naiveUI === amount,
-    shortfall: input.unit === "execution" ? amount - deliverableUI : 0n,
+    quotedRaw: decision.quotedRaw,
+    requiredRaw: decision.requiredRaw,
+    naiveUI: decision.naiveDeliveredShares,
+    deliverableUI: decision.exactDeliveredShares,
+    rejection: decision.reason,
+    rawSpent: decision.rawToTransfer,
+    deliveredUI: decision.sharesToDeliver,
+    naiveMatches:
+      input.unit !== "execution" || decision.naiveDeliveredShares === amount,
+    shortfall: decision.shortfall,
   };
 }
