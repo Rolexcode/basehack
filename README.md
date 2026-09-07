@@ -1,4 +1,53 @@
-# Invariant B20 intent spike
+# Invariant Lab
+
+**Execute what the user meant.** An interactive developer lab for share-denominated instructions on Base: 2 share-equivalents intended, 8 delivered by a stale quote, 2 delivered by execution-time conversion.
+
+**Live app: [invariant-lab.vercel.app](https://invariant-lab.vercel.app)** · [Source](https://github.com/Rolexcode/basehack)
+
+## Web app
+
+The Next.js app wraps the original research spike with:
+
+- Four interactive scenarios: forward split, reverse split with a spend cap, exactness rejection, and no-change control.
+- Three explicit instruction meanings: execution-time shares, authorization-time position, and fixed raw tokens.
+- Exact BigInt arithmetic, input validation, a replayable execution timeline, and JSON result export.
+- Read-only Coinbase stock metadata and conversion helpers on Base mainnet, using addresses from [Base's official integration guide](https://docs.base.org/specifications/b20/tokenized-stocks-on-base).
+- A responsive interface, keyboard controls, reduced-motion support, explicit loading/error states, and linked source evidence.
+
+The browser is an integer simulation of the pinned Solidity fixtures, **not an EVM execution or a trading application**. The lab uses 18-decimal amounts to match the existing tests. Live contract reads use each token's actual decimals (NVDAc returned 8 during verification). Using a live multiplier in the experiment seeds the starting factor only; subsequent changes are hypothetical.
+
+### Run locally
+
+Requires Node.js 22 or newer and npm. From this repository:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open http://localhost:3000. No API keys, wallet, funds, or paid service are required.
+
+```sh
+npm test                 # Integer-model tests
+npm run build            # Production build and TypeScript check
+npm run test:browser     # Playwright; uses installed Google Chrome
+```
+
+Playwright starts the production server automatically, so build first. Browser tests deliberately stub RPC failures to verify recovery without depending on public endpoint uptime. The actual chain reader is verified separately.
+
+### Live read boundaries
+
+`GET /api/stocks?ticker=NVDAc` supports a fixed allowlist of NVDAc, AAPLc, TSLAc, MSFTc, and AMZNc. It verifies chain 8453 and a recent block, then pins name, symbol, decimals, multiplier, precision, and both conversion-helper reads to that block. It uses free public RPC endpoints, deduplicates in-flight reads, caches successes, and returns HTTP 503 on failure. It never substitutes mock values. The interface timestamps each observation and marks older snapshots.
+
+Only view calls are made. No private keys, approvals, signatures, contract deployments, or mainnet transactions are used. These reads do not establish transfer eligibility, liquidity, market value, or live scheduled-multiplier support.
+
+### Deployment and submission
+
+The repository root is a Next.js project with Vercel configuration. Deploy to a free Hobby account without paid add-ons. No database, paid API, or other infrastructure is needed. The original Foundry sources stay in place; `.vercelignore` excludes them from the web deployment upload.
+
+See [submission readiness](docs/submission-readiness.md) for outstanding submission material and [verification](docs/verification.md) for checks performed. Builder Code attribution remains pending until the builder's real code is provided. The app sends no transactions, so it has no transaction calldata to attribute.
+
+## Original B20 intent spike — preserved findings
 
 This bounded Foundry experiment tests one claim: a delayed B20 instruction stated in UI/share-equivalent units can be mis-executed if an application converts it to raw ERC-20 units at authorization time and the multiplier changes before execution.
 

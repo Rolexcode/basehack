@@ -18,3 +18,11 @@ demo-video/.cache/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Web dependencies, build output, local deployment state
+node_modules/
+.next/
+.vercel/
+*.tsbuildinfo
+test-results/
+playwright-report/
