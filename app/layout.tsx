@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Invariant Lab — Execute what the user meant.",
+  title: "Invariant Lab — You asked for 2 shares.",
   description:
-    "An interactive B20 intent lab. Reproduce stale share conversions, spending limits and exactness guards, with read-only Coinbase stock data on Base.",
+    "You asked for 2 shares. Invariant checks for exact delivery or blocks the instruction. Try the developer guard with simulated splits and live read-only Base stock data.",
   other: {
     "base:app_id": "6a9ebc7825fe83ce38216f75",
   },

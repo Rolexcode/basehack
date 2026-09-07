@@ -9,6 +9,40 @@ import {
 
 const e18 = (n: bigint) => n * WAD;
 
+test("8-decimal stock amounts stay separate from 18-decimal multipliers", () => {
+  const r = guardIntent({
+    unit: "execution",
+    amount: 200_000_000n,
+    quoteMultiplier: WAD,
+    executionMultiplier: 4n * WAD,
+    maxRawSpend: 300_000_000n,
+  });
+  assert.equal(r.ok, true);
+  assert.equal(r.quotedRaw, 200_000_000n);
+  assert.equal(r.naiveDeliveredShares, 800_000_000n);
+  assert.equal(r.rawToTransfer, 50_000_000n);
+  assert.equal(r.sharesToDeliver, 200_000_000n);
+});
+
+test("8-decimal stock reverse splits and rounding still block safely", () => {
+  const request = {
+    unit: "execution" as const,
+    amount: 200_000_000n,
+    quoteMultiplier: WAD,
+    maxRawSpend: 300_000_000n,
+  };
+  const capped = guardIntent({ ...request, executionMultiplier: WAD / 4n });
+  assert.equal(capped.requiredRaw, 800_000_000n);
+  assert.equal(capped.reason, "cap");
+  assert.equal(capped.rawToTransfer, 0n);
+  const rounded = guardIntent({ ...request, executionMultiplier: 3n * WAD });
+  assert.equal(rounded.requiredRaw, 66_666_666n);
+  assert.equal(rounded.exactDeliveredShares, 199_999_998n);
+  assert.equal(rounded.shortfall, 2n);
+  assert.equal(rounded.reason, "rounding");
+  assert.equal(rounded.rawToTransfer, 0n);
+});
+
 test("execution-time intent preserves the exact requested shares", () => {
   const r = guardIntent({
     unit: "execution",

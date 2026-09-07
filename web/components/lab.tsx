@@ -194,18 +194,17 @@ export default function Lab() {
         <section className="container hero">
           <div className="hero-copy">
             <p className="eyebrow">
-              <span className="base-square" /> BUILT FOR B20 ON BASE
+              <span className="base-square" /> FOR STOCK APPS ON BASE
             </p>
             <h1>
-              Execute what
+              You asked for
               <br />
-              the user <span>meant.</span>
+              <span>2 shares.</span>
             </h1>
             <p className="hero-description">
-              Stocks change. The instruction shouldn’t.
-              <br />
-              See how a stale conversion can turn 2 intended shares into 8—and
-              how to preserve the promise.
+              Invariant checks that you receive exactly 2—or blocks the
+              instruction. See how apps can preserve what you asked for when
+              a stock split happens before execution.
             </p>
             <a href="#experiment" className="text-link">
               Try the experiment <ArrowDown size={17} aria-hidden="true" />
@@ -492,11 +491,9 @@ export default function Lab() {
             </div>
             <a
               className="text-link"
-              href={`${REPO}/blob/main/src/IntentShareExecutor.sol`}
-              target="_blank"
-              rel="noreferrer"
+              href="/sdk"
             >
-              Read the Solidity <ArrowUpRight size={16} aria-hidden="true" />
+              Use Invariant in your app <ArrowRight size={16} aria-hidden="true" />
             </a>
           </div>
           <div className="principles">

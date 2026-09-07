@@ -7,22 +7,36 @@ export const metadata: Metadata = {
     "A reusable intent guard for delayed share-denominated B20 instructions.",
 };
 
-const example = `import { guardIntent, WAD } from "@/web/lib/invariant";
+const example = `// Server-side, read-only example inside this repository.
+import { readStock } from "@/web/lib/base-reader";
+import { guardIntent, WAD } from "@/web/lib/invariant";
+
+// Metadata and multiplier are read at the same Base block.
+// Change the ticker to another stock supported by readStock.
+const stock = await readStock("NVDAc");
+if (BigInt(stock.precision) !== WAD) {
+  throw new Error("Unsupported multiplier precision");
+}
+
+// Amounts use the token's decimals. WAD scales multipliers only.
+const tokenUnit = 10n ** BigInt(stock.decimals);
+const quoteMultiplier = BigInt(stock.multiplier);
 
 const decision = guardIntent({
   unit: "execution",
-  amount: 2n * WAD,               // user asked for 2 shares
-  quoteMultiplier: 1n * WAD,      // when the instruction was created
-  executionMultiplier: 4n * WAD,  // when it is about to execute
-  maxRawSpend: 3n * WAD,           // user's hard spending ceiling
+  amount: 2n * tokenUnit,        // exactly 2 share-equivalents
+  quoteMultiplier,
+  executionMultiplier: quoteMultiplier * 4n, // HYPOTHETICAL 4x change
+  maxRawSpend: 3n * tokenUnit,    // at most 3 raw tokens
 });
 
 if (!decision.ok) {
   // cap exceeded or exact amount cannot be represented: do not transfer
-  throw new Error(decision.reason);
+  throw new Error(decision.reason ?? "Instruction blocked");
 }
 
-// decision.rawToTransfer is the amount the execution layer may use.`;
+// rawToTransfer is already in raw token base units: do not rescale.
+// This example calculates a decision. It submits no transaction.`;
 
 export default function SdkPage() {
   return (
@@ -46,7 +60,21 @@ export default function SdkPage() {
       </section>
 
       <section style={{ marginTop: 32 }}>
-        <p className="eyebrow">MINIMAL INTEGRATION</p>
+        <h2>Start with the stock’s actual precision.</h2>
+        <p style={{ marginTop: 16 }}>
+          Run this server-side example within the repository. The reader supports
+          the stocks listed in the lab and rejects unavailable or unsupported
+          data. It uses a real snapshot, then simulates a 4× change; that change
+          is not a live stock event or an execution quote.
+        </p>
+        <p style={{ marginTop: 16 }}>
+          Token decimals and multiplier precision are separate. With 8 token
+          decimals, 2 shares means 200,000,000 share base units. A 1× multiplier
+          still means 1,000,000,000,000,000,000. In the simulated 1× → 4× case,
+          the guard returns 50,000,000 raw base units: 0.5 raw tokens delivering
+          exactly 2 share-equivalents. Read decimals for every asset; do not
+          assume 8 or 18.
+        </p>
         <pre style={{ marginTop: 16, padding: 24, overflowX: "auto", background: "#111915", color: "#f4f7f5", borderRadius: 12, fontFamily: "var(--mono)", fontSize: 13, lineHeight: 1.65 }}>
           <code>{example}</code>
         </pre>
@@ -56,6 +84,13 @@ export default function SdkPage() {
         <p className="eyebrow">SECURITY BOUNDARY</p>
         <p style={{ marginTop: 12 }}>
           This guard is intentionally pure logic. It does not sign orders, hold keys, approve tokens, submit transactions, or make a delayed action atomic by itself. A production execution layer must separately handle authentication, nonces, deadlines, cancellation, allowances, asset allowlists, transfer restrictions, replay protection, and same-transaction multiplier reads.
+        </p>
+        <p style={{ marginTop: 12 }}>
+          For another app, provide amounts in that asset’s native base units and
+          verified multipliers scaled by WAD. A cached HTTP snapshot is suitable
+          for this demonstration, not authorization to transfer funds. The real
+          executor must recheck the effective multiplier, cap, and exactness in
+          the same transaction as the transfer.
         </p>
       </section>
 

@@ -10,7 +10,7 @@ Checked September 7, 2026. Invariant Lab is a developer integration demo for pre
 | Live URL | [invariant-lab.vercel.app](https://invariant-lab.vercel.app), public production domain verified without login |
 | Public demo video | Intentionally deferred by builder; record after product is ready |
 | Submission X post | Pending builder publication; tag @buildonbase and include public Loom demo |
-| Builder Code | Pending builder's actual registered code; do not invent one |
+| Builder Code | `bc_uvgijblh`, reported in the builder's shared registration conversation |
 | Submission form | Not submitted |
 | Eligibility | Builder must confirm age 18+ and eligible jurisdiction; the app enables no trading |
 | Budget | No purchases, mainnet transactions, paid APIs, or paid add-ons |

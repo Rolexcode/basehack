@@ -8,9 +8,12 @@ export type GuardBlockReason = "cap" | "rounding" | null;
 
 export type GuardRequest = {
   unit: IntentUnit;
+  /** Share base units for execution/position intent; raw base units for raw intent. Use the asset's decimals, not WAD. */
   amount: bigint;
+  /** Multipliers always use WAD precision, independently of the asset's decimals. */
   quoteMultiplier: bigint;
   executionMultiplier: bigint;
+  /** Raw token base units using the asset's decimals. */
   maxRawSpend: bigint;
 };
 

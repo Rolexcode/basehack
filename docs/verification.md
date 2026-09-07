@@ -1,5 +1,17 @@
 # Verification — September 7, 2026
 
+## Product polish verification
+
+- `npm test`: **23 passed**, including the 900-case guard matrix and new native 8-decimal regressions for exact delivery, reverse-split cap rejection, and rounding rejection.
+- `npm run build`: passed for the final homepage and SDK guide.
+- The exact displayed SDK snippet was extracted into a temporary TypeScript file and passed the repository's strict type check. The temporary file was removed.
+- `npm run test:browser`: **9 passed**. The layout checks now also follow the developer-guide link and verify `/sdk` at 375, 768, and 1280 px with no document overflow. Homepage and guide screenshots were inspected.
+- The first browser run had one navigation timeout while waiting for the full `load` event, before its assertions. Navigation now waits for `domcontentloaded`, followed by existing UI assertions; the complete rerun passed.
+- The original Solidity contracts, tests, vendored reference files, and captured logs are unchanged by this polish release. Earlier Foundry results below remain historical evidence.
+- The SDK example obtains token decimals from the existing same-block stock reader. Token amounts use native base units; multiplier precision remains WAD. Its subsequent 4× change is explicitly hypothetical and it performs no transfer.
+
+## Earlier baseline verification
+
 - `npm run build`: Next.js production build and TypeScript compilation passed.
 - `npm test`: 14 integer-model tests passed, including independently asserted Foundry outcomes, cap boundaries, rounding, input precision, overflow, and successful-delivery invariants.
 - `forge test -vv`: all original 8 Solidity tests passed again from the Desktop/basehack repository; no existing contract or test was modified.

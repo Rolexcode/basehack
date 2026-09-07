@@ -1,8 +1,10 @@
 # Invariant Lab
 
-**Execute what the user meant.** An interactive developer lab for share-denominated instructions on Base: 2 share-equivalents intended, 8 delivered by a stale quote, 2 delivered by execution-time conversion.
+**You asked for 2 shares.** Invariant checks for exact delivery or blocks the instruction. Explore how a stale conversion can deliver 8 share-equivalents instead of 2, and use the reusable guard to check the intended amount and spending cap.
 
 **Live app: [invariant-lab.vercel.app](https://invariant-lab.vercel.app)** · [Source](https://github.com/Rolexcode/basehack)
+
+**Developer guide: [Use Invariant in your app](https://invariant-lab.vercel.app/sdk)**. `web/lib/invariant.ts` accepts amounts and spending caps in the asset’s native base units, using its actual `decimals()`. Only multipliers use the fixed 18-decimal WAD scale. The guide reads actual stock metadata and labels the subsequent 4× change as hypothetical. The guard calculates a decision; a production executor must enforce it within the transfer transaction.
 
 ## Web app
 
@@ -45,7 +47,7 @@ Only view calls are made. No private keys, approvals, signatures, contract deplo
 
 The repository root is a Next.js project with Vercel configuration. Deploy to a free Hobby account without paid add-ons. No database, paid API, or other infrastructure is needed. The original Foundry sources stay in place; `.vercelignore` excludes them from the web deployment upload.
 
-See [submission readiness](docs/submission-readiness.md) for outstanding submission material and [verification](docs/verification.md) for checks performed. Builder Code attribution remains pending until the builder's real code is provided. The app sends no transactions, so it has no transaction calldata to attribute.
+See [submission readiness](docs/submission-readiness.md) for outstanding submission material and [verification](docs/verification.md) for checks performed. The builder reported registration code `bc_uvgijblh`. The app sends no transactions, so it has no transaction calldata to attribute.
 
 ## Original B20 intent spike — preserved findings
 

@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
 test("forward split, cap rejection, boundary success and exactness are legible", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("naive-amount")).toHaveText("8");
   await expect(page.getByTestId("safe-amount")).toHaveText("2");
   await page.getByRole("button", { name: "02 Reverse split" }).click();
@@ -30,7 +30,7 @@ test("forward split, cap rejection, boundary success and exactness are legible",
 test("intent changes and invalid inputs preserve correct applied results", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   await page.getByLabel("The user means").selectOption("position");
   await page.getByRole("button", { name: "Run experiment" }).click();
   await expect(page.getByTestId("safe-amount")).toHaveText("8");
@@ -47,7 +47,7 @@ test("intent changes and invalid inputs preserve correct applied results", async
 test("RPC error stays explicit, recovery works, and full address is shown", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(
     page.getByRole("heading", { name: "Live read unavailable" }),
   ).toBeVisible();
@@ -66,7 +66,7 @@ test("RPC error stays explicit, recovery works, and full address is shown", asyn
 for (const width of [375, 768, 1280])
   test(`layout at ${width}px has no horizontal overflow`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await expect(
       page.getByRole("heading", { name: "One intent. Two outcomes." }),
     ).toBeVisible();
@@ -79,11 +79,20 @@ for (const width of [375, 768, 1280])
       path: `test-results/lab-${width}.png`,
       fullPage: true,
     });
+    await page.getByRole("link", { name: "Use Invariant in your app" }).click();
+    await expect(page).toHaveURL(/\/sdk$/);
+    await expect(page.getByRole("heading", { name: "Start with the stock’s actual precision." })).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({ path: `test-results/sdk-${width}.png`, fullPage: true });
   });
 test("shareable presets, keyboard focus and downloadable report work", async ({
   page,
 }) => {
-  await page.goto("/#rounding");
+  await page.goto("/#rounding", { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("safe-amount")).toHaveText("Blocked");
   await page.keyboard.press("Tab");
   await expect(
@@ -97,7 +106,7 @@ test("shareable presets, keyboard focus and downloadable report work", async ({
 });
 
 test("unknown hashes do not crash the app", async ({ page }) => {
-  await page.goto("/#toString");
+  await page.goto("/#toString", { waitUntil: "domcontentloaded" });
   await expect(page.getByTestId("safe-amount")).toHaveText("2");
 });
 
@@ -130,7 +139,7 @@ test("successful live read seeds a hypothetical scenario without retaining a mis
       }),
     }),
   );
-  await page.goto("/#reverse");
+  await page.goto("/#reverse", { waitUntil: "domcontentloaded" });
   await page
     .getByRole("button", { name: "Use multiplier in experiment" })
     .click();
