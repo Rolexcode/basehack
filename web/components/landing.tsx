@@ -50,13 +50,13 @@ export default function Landing() {
               before it goes through, so the amount does not quietly change on you.
             </p>
             <div className={styles.heroActions}>
-              <Link href="/playground" className={styles.primary}>Try a sample order <ArrowRight size={17} /></Link>
+              <Link href="/playground" className={styles.primary}>Open Invariant <ArrowRight size={17} /></Link>
               <a href="#how" className={styles.secondary}>See how it works</a>
             </div>
-            <p className={styles.heroNote}>No wallet needed. No funds move in the demo.</p>
+            <p className={styles.heroNote}>Explore without connecting a wallet.</p>
           </div>
 
-          <div className={styles.promiseStage} aria-label="A user asks for two shares. A simulated stock change would make a stale conversion deliver eight, while Invariant keeps the order at two.">
+          <div className={styles.promiseStage} aria-label="A user asks for two shares. A stock-change scenario would make a stale conversion deliver eight, while Invariant keeps the order at two.">
             <div className={styles.stageChrome}>
               <span>INVARIANT / ORDER 001</span>
               <span className={styles.liveDot}>BASE</span>
@@ -92,7 +92,7 @@ export default function Landing() {
                 <small><Check size={13} /> same order, still intact</small>
               </div>
             </div>
-            <p className={styles.hypo}>This example uses a simulated stock change to show what can happen while an order waits.</p>
+            <p className={styles.hypo}>Illustrative stock-change scenario.</p>
           </div>
         </div>
       </section>
@@ -133,7 +133,7 @@ export default function Landing() {
             Say you were okay spending up to 3 raw tokens. If the same order would now need 8,
             Invariant will stop it instead of changing the amount you approved.
           </p>
-          <Link href="/playground#reverse" className={styles.darkLink}>Try this example <ArrowRight size={16} /></Link>
+          <Link href="/playground#reverse" className={styles.darkLink}>See the safety check <ArrowRight size={16} /></Link>
         </div>
         <div className={styles.blockVisual}>
           <div className={styles.blockTop}>
@@ -196,8 +196,8 @@ result.ok ? execute(result) : block();`}</pre>
 
       <section className={styles.assets}>
         <div className={styles.assetsTitle}>
-          <div><p className={styles.sectionTag}>REAL STOCKS ON BASE</p><h2>Try it with real tokenized stock data.</h2></div>
-          <Link href="/playground#live" className={styles.assetsLink}>Open stock reads <ArrowUpRight size={15} /></Link>
+          <div><p className={styles.sectionTag}>REAL STOCKS ON BASE</p><h2>Live tokenized stock data, right inside Invariant.</h2></div>
+          <Link href="/playground#live" className={styles.assetsLink}>View live stock data <ArrowUpRight size={15} /></Link>
         </div>
         <div className={styles.assetRail}>
           {assets.map(([ticker, company], index) => (
@@ -210,13 +210,13 @@ result.ok ? execute(result) : block();`}</pre>
             </article>
           ))}
         </div>
-        <p className={styles.assetNote}>Live stock data is read-only. The stock-change examples above are simulated.</p>
+        <p className={styles.assetNote}>Live Base stock reads · illustrative stock-change scenario.</p>
       </section>
 
       <section className={styles.proofBand}>
         <div><strong>8/8</strong><span>safety tests passed</span></div>
-        <div><strong>5</strong><span>tokenized stocks available to explore</span></div>
-        <div><strong>0</strong><span>wallets needed to try it</span></div>
+        <div><strong>5</strong><span>Base stock reads</span></div>
+        <div><strong>0</strong><span>wallets needed to get started</span></div>
       </section>
 
       <footer className={styles.footer}>
@@ -232,11 +232,11 @@ result.ok ? execute(result) : block();`}</pre>
             <p>Invariant checks before execution so your stock order does not quietly change.</p>
           </div>
           <div className={styles.footerActions}>
-            <Link href="/playground" className={styles.primary}>Try Invariant <ArrowRight size={16} /></Link>
+            <Link href="/playground" className={styles.primary}>Open Invariant <ArrowRight size={16} /></Link>
             <a href={REPO} target="_blank" rel="noreferrer"><Github size={16} /> GitHub</a>
           </div>
         </div>
-        <div className={styles.footerMeta}><span>Built for tokenized-stock apps on Base.</span><span>Read-only web app · no funds moved</span></div>
+        <div className={styles.footerMeta}><span>Built for tokenized-stock apps on Base.</span><span>Live Base data · no wallet required</span></div>
       </footer>
     </main>
   );
