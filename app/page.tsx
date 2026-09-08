@@ -1,4 +1,5 @@
-import Lab from "@/web/components/lab";
+import Landing from "@/web/components/landing";
+
 export default function Page() {
-  return <Lab />;
+  return <Landing />;
 }
