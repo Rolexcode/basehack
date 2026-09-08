@@ -39,6 +39,7 @@ export function buildIntentManifest(input: {
   const requested = parseDecimal(input.requestedShares, input.decimals);
   const cap = parseDecimal(input.maxRawSpend, input.decimals);
   if (requested === 0n) throw new Error("Requested shares must be greater than zero.");
+  if (cap === 0n) throw new Error("Maximum raw-token spend must be greater than zero.");
 
   return {
     schema: "invariant.intent.v1",

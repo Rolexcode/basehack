@@ -151,3 +151,41 @@ test("successful live read seeds a hypothetical scenario without retaining a mis
     }),
   ).toBeVisible();
 });
+
+test("manifest result cannot drift from edited form values", async ({ page }) => {
+  await page.unroute("**/api/stocks**");
+  await page.route("**/api/stocks**", (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        ticker: "NVDAc",
+        company: "NVIDIA",
+        address: "0xb20000000000000000000078ee7ce2fe4908108c",
+        name: "NVIDIA Corporation",
+        symbol: "NVDAc",
+        decimals: 8,
+        multiplier: "1000000000000000000",
+        precision: "1000000000000000000",
+        blockNumber: "50992614",
+        blockTimestamp: new Date().toISOString(),
+        observedAt: new Date().toISOString(),
+        endpoint: "https://base-rpc.publicnode.com",
+        chainId: 8453,
+        requestedUI: "200000000",
+        rawForTwo: "200000000",
+        uiRoundTrip: "200000000",
+      }),
+    }),
+  );
+  await page.goto("/manifest", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText("NVDAc verified on Base mainnet")).toBeVisible();
+  await page.getByRole("button", { name: "Create intent manifest" }).click();
+  await expect(page.getByText("exactly 2 shares at execution")).toBeVisible();
+  const firstId = await page.locator("code").innerText();
+  await page.getByLabel("Requested shares").fill("8");
+  await expect(page.getByRole("heading", { name: "The promise now has an ID." })).toHaveCount(0);
+  await page.getByRole("button", { name: "Create intent manifest" }).click();
+  await expect(page.getByText("exactly 8 shares at execution")).toBeVisible();
+  expect(await page.locator("code").innerText()).not.toBe(firstId);
+});

@@ -1,6 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { buildIntentManifest, canonicalIntent } from "../lib/manifest";
+import {
+  buildIntentManifest,
+  canonicalIntent,
+  createIntentManifest,
+} from "../lib/manifest";
 
 test("manifest encodes exact Base asset and native-unit promise deterministically", () => {
   const input = {
@@ -32,7 +36,26 @@ test("manifest rejects wrong chain, malformed address, zero shares and excess pr
   assert.throws(() => buildIntentManifest({ ...base, chainId: 1 }));
   assert.throws(() => buildIntentManifest({ ...base, address: "0x1234" }));
   assert.throws(() => buildIntentManifest({ ...base, requestedShares: "0" }));
+  assert.throws(() => buildIntentManifest({ ...base, maxRawSpend: "0" }));
   assert.throws(() => buildIntentManifest({ ...base, requestedShares: "1.000000001" }));
+});
+
+test("intent ID is stable for the same fields and changes with the promise", async () => {
+  const input = {
+    chainId: 8453,
+    ticker: "NVDAc",
+    address: "0xb20000000000000000000078ee7ce2fe4908108c",
+    decimals: 8,
+    requestedShares: "2",
+    maxRawSpend: "3",
+  };
+  const first = await createIntentManifest(input);
+  const second = await createIntentManifest(input);
+  const changed = await createIntentManifest({ ...input, requestedShares: "8" });
+  assert.equal(first.id, second.id);
+  assert.notEqual(first.id, changed.id);
+  assert.match(first.id, /^inv_sha256_[a-f0-9]{64}$/);
+  assert.equal(first.signed, false);
 });
 
 test("canonical manifest excludes changing execution data", () => {

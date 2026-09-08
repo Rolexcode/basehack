@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createIntentManifest, type IntentManifestEnvelope } from "../lib/manifest";
+import { formatDecimal } from "../lib/intent";
 import { STOCKS, type StockSnapshot } from "../lib/stocks";
 
 export default function ManifestBuilder() {
@@ -13,6 +14,15 @@ export default function ManifestBuilder() {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const stock = useMemo(() => STOCKS.find((item) => item.ticker === ticker)!, [ticker]);
+
+  function updateAmount(
+    setter: (value: string) => void,
+    value: string,
+  ) {
+    setter(value);
+    setManifest(null);
+    setStatus("");
+  }
 
   useEffect(() => {
     const controller = new AbortController();
@@ -109,11 +119,11 @@ export default function ManifestBuilder() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16 }}>
           <label style={{ display: "grid", gap: 8 }}>
             <span>Requested shares</span>
-            <input value={shares} onChange={(event) => setShares(event.target.value)} inputMode="decimal" maxLength={80} />
+            <input value={shares} onChange={(event) => updateAmount(setShares, event.target.value)} inputMode="decimal" maxLength={80} />
           </label>
           <label style={{ display: "grid", gap: 8 }}>
             <span>Maximum raw-token spend</span>
-            <input value={cap} onChange={(event) => setCap(event.target.value)} inputMode="decimal" maxLength={80} />
+            <input value={cap} onChange={(event) => updateAmount(setCap, event.target.value)} inputMode="decimal" maxLength={80} />
           </label>
         </div>
 
@@ -134,8 +144,8 @@ export default function ManifestBuilder() {
           <h2 style={{ marginTop: 12, color: "#fff" }}>The promise now has an ID.</h2>
           <div style={{ display: "grid", gap: 10, marginTop: 22 }}>
             <p><strong>Stock:</strong> {manifest.manifest.asset.ticker}</p>
-            <p><strong>Instruction:</strong> exactly {shares} shares at execution</p>
-            <p><strong>Maximum spend:</strong> {cap} raw tokens</p>
+            <p><strong>Instruction:</strong> exactly {formatDecimal(BigInt(manifest.manifest.intent.requestedShareBaseUnits), manifest.manifest.asset.decimals)} shares at execution</p>
+            <p><strong>Maximum spend:</strong> {formatDecimal(BigInt(manifest.manifest.intent.maxRawSpendBaseUnits), manifest.manifest.asset.decimals)} raw tokens</p>
             <p><strong>Policy:</strong> exact-or-block</p>
             <p style={{ overflowWrap: "anywhere" }}><strong>Intent ID:</strong> <code>{manifest.id}</code></p>
           </div>

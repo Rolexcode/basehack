@@ -4,7 +4,7 @@
 
 **Live app: [invariant-lab.vercel.app](https://invariant-lab.vercel.app)** · [Source](https://github.com/Rolexcode/basehack)
 
-**Developer guide: [Use Invariant in your app](https://invariant-lab.vercel.app/sdk)**. `web/lib/invariant.ts` accepts amounts and spending caps in the asset’s native base units, using its actual `decimals()`. Only multipliers use the fixed 18-decimal WAD scale. The guide reads actual stock metadata and labels the subsequent 4× change as hypothetical. The guard calculates a decision; a production executor must enforce it within the transfer transaction.
+**Developer guide: [Use Invariant in your app](https://invariant-lab.vercel.app/sdk)** · **[Create an Intent Manifest](https://invariant-lab.vercel.app/manifest)**. `web/lib/invariant.ts` accepts amounts and spending caps in the asset’s native base units, using its actual `decimals()`. Only multipliers use the fixed 18-decimal WAD scale. The guide reads actual stock metadata and labels the subsequent 4× change as hypothetical. The guard calculates a decision; a production executor must enforce it within the transfer transaction.
 
 ## Web app
 
@@ -88,9 +88,9 @@ This does **not** confirm that deployed Coinbase tokenized stocks expose Cobalt 
 
 ## Assessment
 
-**Technical gate: passed. Product gate: not passed by this experiment.**
+**Technical gate: passed. Product direction: focused on a developer safety primitive.**
 
-The demonstrated issue is useful as an integration library or SDK guardrail for delayed, share-denominated B20 instructions. The solution is currently too compact to justify a standalone consumer product: preserve the authorized unit, convert at the correct time, enforce spend/receive bounds, and handle rounding explicitly. The experiment does not show that production applications currently make this mistake or that users demand a separate product.
+The experiment demonstrates a reusable guard and deterministic Intent Manifest for delayed, share-denominated B20 instructions. Its claim stays narrow: bind the authorized unit, Base asset, amount, spending cap, and exact-or-block policy; then use current conversion data at execution. It does not claim that production applications currently make this mistake or that the manifest alone authorizes a trade.
 
 ## Reproduce
 

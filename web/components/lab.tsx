@@ -179,6 +179,7 @@ export default function Lab() {
         <nav aria-label="Main navigation">
           <a href="#experiment">Experiment</a>
           <a href="#live">Onchain reads</a>
+          <a href="/manifest">Manifest</a>
           <a
             className="github-link"
             href={REPO}
