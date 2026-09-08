@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Invariant — Execute what the user meant.",
+  title: "Invariant — Keep stock orders on track",
   description:
-    "Invariant preserves tokenized-stock instructions through execution with exact-or-block intent guards, deterministic manifests, and read-only Base stock context.",
+    "Invariant checks tokenized-stock orders again before execution so the amount and spending limits do not quietly change while the order waits.",
   other: {
     "base:app_id": "6a9ebc7825fe83ce38216f75",
   },
