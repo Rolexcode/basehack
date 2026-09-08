@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Check, Copy, Download, ShieldCheck } from "lucide-react";
 import { createIntentManifest, type IntentManifestEnvelope } from "../lib/manifest";
 import { formatDecimal } from "../lib/intent";
 import { STOCKS, type StockSnapshot } from "../lib/stocks";
+import styles from "./manifest-builder.module.css";
 
 export default function ManifestBuilder() {
   const [ticker, setTicker] = useState("NVDAc");
@@ -15,10 +17,7 @@ export default function ManifestBuilder() {
   const [loading, setLoading] = useState(true);
   const stock = useMemo(() => STOCKS.find((item) => item.ticker === ticker)!, [ticker]);
 
-  function updateAmount(
-    setter: (value: string) => void,
-    value: string,
-  ) {
+  function updateAmount(setter: (value: string) => void, value: string) {
     setter(value);
     setManifest(null);
     setStatus("");
@@ -42,7 +41,7 @@ export default function ManifestBuilder() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setSnapshot(null);
-          setStatus("Live Base read unavailable. Retry in a moment.");
+          setStatus("Base data is unavailable right now. Try again in a moment.");
         }
       })
       .finally(() => {
@@ -63,17 +62,17 @@ export default function ManifestBuilder() {
         maxRawSpend: cap,
       });
       setManifest(next);
-      setStatus("Intent manifest created from the verified Base asset snapshot.");
+      setStatus("Order record created.");
     } catch (error) {
       setManifest(null);
-      setStatus(error instanceof Error ? error.message : "Could not create manifest.");
+      setStatus(error instanceof Error ? error.message : "Could not create the order record.");
     }
   }
 
   async function copyManifest() {
     if (!manifest) return;
     await navigator.clipboard.writeText(JSON.stringify(manifest, null, 2));
-    setStatus("Manifest copied.");
+    setStatus("Order record copied.");
   }
 
   function downloadManifest() {
@@ -85,77 +84,105 @@ export default function ManifestBuilder() {
     anchor.download = `${manifest.id.slice(0, 24)}.json`;
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setStatus("Manifest downloaded.");
+    setStatus("Order record downloaded.");
   }
 
   return (
-    <div style={{ display: "grid", gap: 24 }}>
-      <section style={{ display: "grid", gap: 18, padding: 28, background: "var(--surface)", border: "1px solid var(--line)", borderRadius: 12 }}>
-        <div>
-          <p className="eyebrow">1 / CHOOSE THE STOCK</p>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-            {STOCKS.map((item) => (
-              <button key={item.ticker} onClick={() => setTicker(item.ticker)} aria-pressed={ticker === item.ticker} style={{ padding: "10px 14px", border: "1px solid var(--line)", background: ticker === item.ticker ? "var(--blue-soft)" : "var(--surface)" }}>
-                <strong>{item.ticker}</strong> · {item.company}
-              </button>
-            ))}
-          </div>
+    <div className={styles.builder}>
+      <section className={styles.card}>
+        <div className={styles.stepHead}>
+          <span>01 / CHOOSE THE STOCK</span>
+          <b>BASE MAINNET</b>
         </div>
 
-        <div style={{ padding: 16, background: "var(--paper)", border: "1px solid var(--line)", borderRadius: 8 }}>
+        <div className={styles.stockGrid}>
+          {STOCKS.map((item) => (
+            <button
+              key={item.ticker}
+              onClick={() => setTicker(item.ticker)}
+              data-active={ticker === item.ticker}
+              className={styles.stockButton}
+              type="button"
+            >
+              <strong>{item.ticker}</strong>
+              <small>{item.company}</small>
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.stockMeta}>
           {loading ? (
-            <p>Reading {ticker} from Base…</p>
+            <p className={styles.loading}>Reading {ticker} from Base…</p>
           ) : snapshot ? (
-            <div style={{ display: "grid", gap: 6 }}>
-              <strong>{snapshot.symbol} verified on Base mainnet</strong>
-              <span style={{ fontFamily: "var(--mono)", fontSize: 12, overflowWrap: "anywhere" }}>{snapshot.address}</span>
-              <span style={{ color: "var(--muted)" }}>Decimals {snapshot.decimals} · Block {snapshot.blockNumber}</span>
-            </div>
+            <>
+              <div className={styles.stockMetaTop}>
+                <div className={styles.stockLogo}>{snapshot.company.slice(0, 1)}</div>
+                <div className={styles.stockMetaText}>
+                  <strong>{snapshot.symbol}</strong>
+                  <span>{snapshot.company}</span>
+                </div>
+                <span className={styles.verified}><Check size={13} /> Verified on Base</span>
+              </div>
+              <p className={styles.address}>{snapshot.address}</p>
+            </>
           ) : (
-            <p>{status || `Could not read ${stock.ticker}.`}</p>
+            <p className={styles.error}>{status || `Could not read ${stock.ticker}.`}</p>
           )}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 16 }}>
-          <label style={{ display: "grid", gap: 8 }}>
-            <span>Requested shares</span>
+        <div className={styles.formGrid}>
+          <label className={styles.field}>
+            <span>How many shares?</span>
             <input value={shares} onChange={(event) => updateAmount(setShares, event.target.value)} inputMode="decimal" maxLength={80} />
           </label>
-          <label style={{ display: "grid", gap: 8 }}>
-            <span>Maximum raw-token spend</span>
+          <label className={styles.field}>
+            <span>Your spending limit</span>
             <input value={cap} onChange={(event) => updateAmount(setCap, event.target.value)} inputMode="decimal" maxLength={80} />
           </label>
         </div>
 
-        <div style={{ padding: 16, border: "1px solid var(--line)", borderRadius: 8 }}>
-          <strong>Policy: exact delivery or block</strong>
-          <p style={{ color: "var(--muted)", marginTop: 6 }}>The manifest records the user’s promise. It does not contain or predict a future multiplier.</p>
+        <div className={styles.policy}>
+          <span className={styles.policyIcon}><ShieldCheck size={18} /></span>
+          <div>
+            <strong>Exact amount — or stop</strong>
+            <p>Invariant keeps your stock, amount and spending limit together so the order cannot quietly become something else later.</p>
+          </div>
         </div>
 
-        <button className="primary" onClick={generate} disabled={!snapshot || loading} style={{ padding: "14px 18px", border: 0 }}>
-          Create intent manifest
+        <button className={styles.createButton} onClick={generate} disabled={!snapshot || loading}>
+          Create order record <ArrowRight size={17} />
         </button>
-        {status && <p role="status" style={{ color: "var(--muted)" }}>{status}</p>}
+        {status && !manifest && <p role="status" className={styles.status}>{status}</p>}
       </section>
 
       {manifest && (
-        <section style={{ padding: 28, background: "#111915", color: "#f4f7f5", borderRadius: 12 }}>
-          <p className="eyebrow" style={{ color: "#aeb8b2" }}>INVARIANT INTENT MANIFEST</p>
-          <h2 style={{ marginTop: 12, color: "#fff" }}>The promise now has an ID.</h2>
-          <div style={{ display: "grid", gap: 10, marginTop: 22 }}>
-            <p><strong>Stock:</strong> {manifest.manifest.asset.ticker}</p>
-            <p><strong>Instruction:</strong> exactly {formatDecimal(BigInt(manifest.manifest.intent.requestedShareBaseUnits), manifest.manifest.asset.decimals)} shares at execution</p>
-            <p><strong>Maximum spend:</strong> {formatDecimal(BigInt(manifest.manifest.intent.maxRawSpendBaseUnits), manifest.manifest.asset.decimals)} raw tokens</p>
-            <p><strong>Policy:</strong> exact-or-block</p>
-            <p style={{ overflowWrap: "anywhere" }}><strong>Intent ID:</strong> <code>{manifest.id}</code></p>
+        <section className={styles.result}>
+          <div className={styles.resultHead}>
+            <span>INVARIANT ORDER RECORD</span>
+            <span className={styles.ready}><Check size={12} /> READY</span>
           </div>
-          <p style={{ marginTop: 18, color: "#aeb8b2" }}>
-            SHA-256 identifies these exact fields. This is a deterministic hash, not a wallet signature or authorization.
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 22 }}>
-            <button onClick={copyManifest} style={{ padding: "10px 14px" }}>Copy manifest</button>
-            <button onClick={downloadManifest} style={{ padding: "10px 14px" }}>Download JSON</button>
+          <h2>Your order now has an ID.</h2>
+          <p className={styles.resultSub}>These exact terms can now travel together instead of being rebuilt later from memory or stale data.</p>
+
+          <div className={styles.summary}>
+            <div><span>STOCK</span><strong>{manifest.manifest.asset.ticker}</strong></div>
+            <div><span>SHARES</span><strong>{formatDecimal(BigInt(manifest.manifest.intent.requestedShareBaseUnits), manifest.manifest.asset.decimals)}</strong></div>
+            <div><span>SPENDING LIMIT</span><strong>{formatDecimal(BigInt(manifest.manifest.intent.maxRawSpendBaseUnits), manifest.manifest.asset.decimals)} raw</strong></div>
+            <div><span>RULE</span><strong>Exact / stop</strong></div>
           </div>
+
+          <div className={styles.idBox}>
+            <span>ORDER ID</span>
+            <code>{manifest.id}</code>
+          </div>
+
+          <p className={styles.resultNote}>The ID is a deterministic hash of these fields. It is not a wallet signature or trade authorization.</p>
+
+          <div className={styles.actions}>
+            <button onClick={copyManifest}><Copy size={15} /> Copy record</button>
+            <button onClick={downloadManifest}><Download size={15} /> Download JSON</button>
+          </div>
+          {status && <p role="status" className={styles.status}>{status}</p>}
         </section>
       )}
     </div>
