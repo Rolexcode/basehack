@@ -1,5 +1,5 @@
-import Lab from "@/web/components/lab";
+import Playground from "@/web/components/playground";
 
 export default function PlaygroundPage() {
-  return <Lab />;
+  return <Playground />;
 }
