@@ -1,72 +1,50 @@
-# Security review
+# Security boundaries
 
-Reviewed 2026-09-07 for the Base Builder Quest submission.
+Invariant’s public deployment is a read-only product surface plus reusable decision logic. It is not a broker, custodian or complete transaction executor.
 
-## Scope
+## Current web surface
 
-- `web/lib/invariant.ts` reusable pure intent guard
-- `web/lib/intent.ts` browser simulation adapter
-- `src/IntentShareExecutor.sol` bounded Solidity research fixture
-- `/api/stocks` read-only Base data path
-- Next.js deployment configuration
+- `/api/stocks` accepts only the stock tickers in the project allowlist.
+- Public Base RPC endpoints are fixed in code; callers cannot provide arbitrary RPC URLs or contract addresses.
+- Reads verify Base chain ID `8453`, reject stale blocks and pin each stock snapshot to one block number.
+- Token arithmetic uses integer `bigint` values rather than floating point.
+- The web app does not request private keys, wallet signatures, token approvals or transactions.
+- Security headers disable framing and browser camera/microphone/geolocation access.
 
-This is a hackathon/developer research build, not a production trading or custody system.
+## Invariant Guard
 
-## Checks performed
+`web/lib/invariant.ts` is pure decision logic. It validates integer bounds, multiplier bounds, spending caps and exact representability.
 
-### Intent and arithmetic safety
+A blocked decision returns a zero transfer amount. The guard deliberately distinguishes between:
 
-- All displayed experiment arithmetic uses `bigint`; no floating-point conversion is used for token amounts.
-- Inputs reject negatives, exponent notation, excessive decimal precision, zero requested amounts, zero multipliers, values outside uint256, and B20 multipliers outside uint128.
-- Multiplication fails closed before uint256 overflow rather than wrapping.
-- Exact execution-time share intent rejects floor-rounding underdelivery.
-- Maximum raw spend is enforced before any hypothetical transfer amount is returned.
-- A stress matrix asserts that successful decisions never exceed the user cap and that blocked decisions return zero transfer.
-- Fixed raw-token and signing-time-position instructions are intentionally not normalized as execution-time share promises.
+- shares requested at execution;
+- a raw position fixed at authorization;
+- a fixed raw-token amount.
 
-### API / live-read surface
+Those are different instructions and should not be silently normalized into one another.
 
-- `/api/stocks` accepts only a fixed ticker allowlist; users cannot supply arbitrary contract addresses or RPC URLs.
-- RPC endpoints are hardcoded to known public Base endpoints, preventing user-controlled SSRF through this route.
-- Reads verify Base chain id 8453 and reject blocks older than five minutes.
-- Contract reads for one snapshot are pinned to one block number.
-- Live data is read-only: no key, wallet, signature, approval, deployment, or transaction is used.
-- The reader times out each public RPC attempt and falls back to a second endpoint; it never substitutes mock values for a failed live read.
+## Solidity reference executor
 
-### Web surface
+`src/IntentShareExecutor.sol` exists to make the execution-time behavior testable with Foundry. It checks the spending cap and exact share delivery before transfer, and deletes the stored order before the external `transferFrom` call.
 
-- No `dangerouslySetInnerHTML`, `eval`, `new Function`, `document.write`, private-key handling, mnemonic handling, or secret-bearing environment-variable use was found in the application code during review.
-- The app sends `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, and a restrictive camera/microphone/geolocation permissions policy.
-- User-controlled experiment values are rendered through React, not inserted as raw HTML.
+It is not a production order protocol.
 
-### Solidity research fixture
+## Production requirements
 
-- The order is deleted before the external `transferFrom` call.
-- Only the order owner can execute the current research order.
-- Maximum raw spend and exact-share representability are checked before transfer.
-- The fixture explicitly does not implement signatures or delegated keepers, so it should not be presented as a production order protocol.
+A real execution layer would additionally need, at minimum:
 
-## Important production gaps
+- authenticated authorization such as EIP-712;
+- nonces and replay protection;
+- deadlines and cancellation;
+- asset allowlists and issuer-policy checks;
+- allowance and balance handling;
+- transfer restriction and eligibility handling;
+- explicit tolerance rules for non-exact instructions;
+- keeper/relayer authorization where applicable;
+- same-transaction enforcement of the effective multiplier and transfer;
+- monitoring, rate limiting and incident response;
+- independent security review before real-value use.
 
-These are not hidden behind a “production ready” claim. A production executor would still need, at minimum:
+## Claim boundary
 
-- EIP-712 or equivalent authenticated authorization
-- nonces and replay protection
-- deadlines / expiry
-- cancellation
-- explicit asset allowlists and issuer-policy checks
-- allowance and balance handling
-- transfer restriction / eligibility handling
-- tolerance semantics for non-exact instructions
-- keeper / relayer authorization if third parties can execute
-- same-transaction reads for the effective multiplier and transfer
-- monitoring, incident response, rate limiting and abuse controls
-- independent smart-contract audit before custody or real-value execution
-
-## Threats intentionally avoided by this submission
-
-The public deployment does not custody funds, request approvals, ask for signatures, accept private keys, or execute trades. That substantially reduces the consequence of a web compromise during the hackathon demo.
-
-## Result
-
-No critical vulnerability was identified in the current read-only web application or pure intent guard during this bounded review. The most important risk would come from misrepresenting the experimental Solidity fixture or pure guard as a complete production execution system; the UI, README, SDK page and source comments therefore keep those boundaries explicit.
+Invariant demonstrates an application-level stale-conversion risk for precisely defined delayed instructions. It does not claim that Base, B20 or Coinbase tokenized stocks are broken, or that a production application is currently affected.

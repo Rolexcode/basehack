@@ -1,14 +1,15 @@
 "use client";
+
 export default function ErrorPage({ reset }: { reset: () => void }) {
   return (
     <main className="container section">
-      <h1>The lab hit an error.</h1>
+      <p className="eyebrow">INVARIANT</p>
+      <h1>Something went wrong.</h1>
       <p>
-        Your wallet and funds are not involved. Reload the experiment to
-        continue.
+        Try loading this page again. No wallet action or transaction was submitted by this page.
       </p>
       <button className="primary" onClick={reset}>
-        Reload the lab
+        Try again
       </button>
     </main>
   );

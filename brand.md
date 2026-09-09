@@ -1,7 +1,49 @@
-# Invariant Lab
+# Invariant brand
 
-Design direction: an editorial engineering lab. Warm paper, ink typography, electric blue as the single brand accent. Red means an intent mismatch; green means an intent preserved; amber means a protective rejection.
+Invariant should feel precise, protective and easy to understand before it feels technical.
 
-Typography: system sans for prose, compact system mono for labels and exact quantities. Large, tightly tracked headline. Flat ruled surfaces, restrained corners, no decorative dashboard charts. All color values live in CSS tokens. Choose this direction within the authorized polished frontend scope.
+## Positioning
 
-Voice: explain the outcome before the mechanism. Say share-equivalents where precision matters. Mark simulations at the point of use; cite source and block for live reads.
+Primary message:
+
+**Set your stock order. Get what you asked for.**
+
+Supporting principle:
+
+**Same order — or no order.**
+
+Brand line:
+
+**Your order. Your terms.**
+
+The `2 → 8 → 2` scenario is a proof point, not the entire identity.
+
+## Visual system
+
+- Base blue: `#0052FF`
+- white and soft-blue surfaces
+- dark navy/ink typography
+- green only for protected/success states
+- restrained red only for mismatch states
+- Sora for display type
+- Inter for interface/prose
+- IBM Plex Mono for technical labels and exact values
+- rounded product cards, generous white space and subtle depth
+
+Avoid generic dashboard styling, hacker-terminal aesthetics, decorative crypto imagery and unnecessary gradients.
+
+## Voice
+
+Lead with the user outcome, then explain the mechanism.
+
+Prefer:
+- stock order
+- what you asked for
+- check again before it goes through
+- your spending limit
+- order stopped
+- keep the order details together
+
+Use technical terms such as multiplier, raw token units and share-equivalents only where precision matters.
+
+Illustrative stock-change scenarios must remain clearly separated from live read-only Base data.

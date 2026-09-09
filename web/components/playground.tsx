@@ -49,12 +49,14 @@ const friendlyPreset: Record<Preset, { title: string; note: string }> = {
 export default function Playground() {
   const [preset, setPreset] = useState<Preset>("split");
   const [draft, setDraft] = useState<Experiment>(PRESETS.split);
+  const [applied, setApplied] = useState<Experiment>(PRESETS.split);
   const [result, setResult] = useState<Result>(() => simulate(PRESETS.split));
   const [error, setError] = useState("");
   const [ticker, setTicker] = useState("NVDAc");
   const [snapshot, setSnapshot] = useState<StockSnapshot | null>(null);
   const [stockError, setStockError] = useState("");
   const [loadingStock, setLoadingStock] = useState(false);
+  const dirty = JSON.stringify(draft) !== JSON.stringify(applied);
 
   useEffect(() => {
     const key = window.location.hash.slice(1) as Preset;
@@ -63,9 +65,11 @@ export default function Playground() {
   }, []);
 
   function applyPreset(key: Preset) {
+    const next = PRESETS[key];
     setPreset(key);
-    setDraft(PRESETS[key]);
-    setResult(simulate(PRESETS[key]));
+    setDraft(next);
+    setApplied(next);
+    setResult(simulate(next));
     setError("");
     window.history.replaceState(null, "", `#${key}`);
   }
@@ -74,6 +78,7 @@ export default function Playground() {
     event.preventDefault();
     try {
       const next = simulate(draft);
+      setApplied({ ...draft });
       setResult(next);
       setError("");
       window.history.replaceState(null, "", "#check");
@@ -210,6 +215,9 @@ export default function Playground() {
           <button className={styles.checkButton} type="submit">
             Check order <ArrowRight size={17} />
           </button>
+          {dirty && !error && (
+            <p className={styles.fieldHelp}>Order details changed. Check the order to update the result.</p>
+          )}
         </form>
 
         <div className={styles.resultsCard} aria-live="polite">
@@ -218,13 +226,13 @@ export default function Playground() {
               <span>YOU ASKED FOR</span>
               <strong>{fmt(result.amount)} shares</strong>
             </div>
-            <span className={styles.changeChip}>{draft.before}× → {draft.after}×</span>
+            <span className={styles.changeChip}>{applied.before}× → {applied.after}×</span>
           </div>
 
           <div className={styles.resultGrid}>
             <article className={styles.oldPath}>
               <p>WITHOUT THE CHECK</p>
-              <strong>{naiveValue}</strong>
+              <strong data-testid="naive-amount">{naiveValue}</strong>
               <span>shares</span>
               <div className={result.naiveMatches ? styles.goodState : styles.badState}>
                 {result.naiveMatches ? <Check size={15} /> : <X size={15} />}
@@ -234,7 +242,7 @@ export default function Playground() {
 
             <article className={styles.safePath}>
               <p>WITH INVARIANT</p>
-              <strong>{safeValue}</strong>
+              <strong data-testid="safe-amount">{safeValue}</strong>
               {!blocked && <span>shares</span>}
               <div className={blocked ? styles.blockState : styles.goodState}>
                 {blocked ? <LockKeyhole size={15} /> : <Check size={15} />}
@@ -250,7 +258,7 @@ export default function Playground() {
           <div className={styles.timeline}>
             <div><span>1</span><p>Order set<strong>{fmt(result.quotedRaw)} raw</strong></p></div>
             <ArrowRight size={15} />
-            <div><span>2</span><p>Stock changes<strong>{draft.before}× → {draft.after}×</strong></p></div>
+            <div><span>2</span><p>Stock changes<strong>{applied.before}× → {applied.after}×</strong></p></div>
             <ArrowRight size={15} />
             <div><span>3</span><p>Invariant checks<strong>{blocked ? "Order stopped" : "Order kept"}</strong></p></div>
           </div>
@@ -275,7 +283,7 @@ export default function Playground() {
         </div>
         <div className={styles.baseCard}>
           <div className={styles.stockPicker}>
-            <select value={ticker} onChange={(e) => setTicker(e.target.value)}>
+            <select aria-label="Stock" value={ticker} onChange={(e) => setTicker(e.target.value)}>
               {STOCKS.map((stock) => (
                 <option value={stock.ticker} key={stock.ticker}>{stock.company} · {stock.ticker}</option>
               ))}
@@ -299,8 +307,8 @@ export default function Playground() {
                 <div><span>Block</span><strong>{snapshot.blockNumber}</strong></div>
                 <div><span>2 shares → raw</span><strong>{snapshot.rawForTwo}</strong></div>
               </div>
-              <a href={snapshot.endpoint} target="_blank" rel="noreferrer" className={styles.sourceLink}>
-                View source read <ArrowUpRight size={14} />
+              <a href={`https://basescan.org/token/${snapshot.address}`} target="_blank" rel="noreferrer" className={styles.sourceLink}>
+                View token on BaseScan <ArrowUpRight size={14} />
               </a>
             </div>
           )}
