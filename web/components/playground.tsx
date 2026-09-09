@@ -303,9 +303,9 @@ export default function Playground() {
                 <span className={styles.verified}><Check size={13} /> Base mainnet</span>
               </div>
               <div className={styles.stockStats}>
-                <div><span>Current multiplier</span><strong>{snapshot.multiplier}</strong></div>
+                <div><span>Current multiplier</span><strong>{fmt(BigInt(snapshot.multiplier))}×</strong></div>
                 <div><span>Block</span><strong>{snapshot.blockNumber}</strong></div>
-                <div><span>2 shares → raw</span><strong>{snapshot.rawForTwo}</strong></div>
+                <div><span>2 shares → raw</span><strong>{fmt(BigInt(snapshot.rawForTwo), snapshot.decimals)}</strong></div>
               </div>
               <a href={`https://basescan.org/token/${snapshot.address}`} target="_blank" rel="noreferrer" className={styles.sourceLink}>
                 View token on BaseScan <ArrowUpRight size={14} />
